@@ -2,8 +2,7 @@ package page;
 
 import com.codeborne.selenide.SelenideElement;
 
-import static com.codeborne.selenide.Condition.innerText;
-import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.$;
 
 public class CardsPage {
@@ -30,5 +29,21 @@ public class CardsPage {
         } else {
             debositButton0002.click();
         }
+    }
+
+    public String getFirstCardInfo() {
+        return card0001.shouldBe(visible).getText();
+    }
+
+    public void checkFirstCardInfo(String cardInfo) {
+        card0001.shouldBe(visible, text(cardInfo));
+    }
+
+    public String getSecondCardInfo() {
+        return card0002.shouldBe(visible).getText();
+    }
+
+    public void checkSecondCardInfo(String cardInfo) {
+        card0002.shouldBe(visible, text(cardInfo));
     }
 }

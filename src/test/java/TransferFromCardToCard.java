@@ -52,15 +52,16 @@ public class TransferFromCardToCard {
 
     @Test
     public void testTransferCancelTransferPositive() {
-        firstCardBalance = "10100";
-        secondCardBalance = "9900";
+        String firstCardInfo = cardsPage.getFirstCardInfo();
+        String secondCardInfo = cardsPage.getSecondCardInfo();
+
         transferAmount = "200";
-        cardsPage.checkCardsBalance(firstCardBalance, secondCardBalance);
         cardsPage.depositCard(secondCardBalance);
         depositCardPage.fillForm(transferAmount, firstCardNumber);
         depositCardPage.checkCardNumberTo(secondCardMaskedNumber);
         depositCardPage.cancelTransfer();
 
-        cardsPage.checkCardsBalance(firstCardBalance, secondCardBalance);
+        cardsPage.checkFirstCardInfo(firstCardInfo);
+        cardsPage.checkSecondCardInfo(secondCardInfo);
     }
 }

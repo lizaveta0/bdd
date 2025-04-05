@@ -46,7 +46,7 @@ public class TransferFromCardToCard {
         depositCardPage.submitTransfer();
 
         firstCardBalance = "10100";
-        secondCardNumber = "9900";
+        secondCardBalance = "9900";
         cardsPage.checkCardsBalance(firstCardBalance, secondCardBalance);
     }
 

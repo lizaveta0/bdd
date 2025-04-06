@@ -31,4 +31,8 @@ public class DepositCardPage {
     public void checkCardNumberTo(String card) {
         inputTo.shouldBe(visible, value(card));
     }
+
+    public void checkErrorMessageForAmount(String error) {
+        inputAmount.shouldBe(visible, text(error));
+    }
 }

@@ -1,3 +1,4 @@
+import data.DataHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import page.CardsPage;
@@ -6,19 +7,24 @@ import page.LoginPage;
 import page.VerificationPage;
 
 import static com.codeborne.selenide.Selenide.open;
+import static data.DataHelper.*;
 
 public class TransferFromCardToCard {
     private LoginPage loginPage;
     private VerificationPage verificationPage;
     private CardsPage cardsPage;
     private DepositCardPage depositCardPage;
+    private DataHelper dataHelper = new DataHelper();
+
+    CardInfo firstCardInfo = dataHelper.getCardInfo("0001");
+    CardInfo secondCardInfo = dataHelper.getCardInfo("0002");
 
     private String firstCardBalance;
-    private String firstCardNumber = "5559 0000 0000 0001";
-    private String firstCardMaskedNumber = "**** **** **** 0001";
+    private String firstCardNumber = firstCardInfo.getCardNumber();
+    private String firstCardMaskedNumber = firstCardInfo.getMaskedCardNumber();
     private String secondCardBalance;
-    private String secondCardNumber = "5559 0000 0000 0002";
-    private String secondCardMaskedNumber = "**** **** **** 0002";
+    private String secondCardNumber = secondCardInfo.getCardNumber();
+    private String secondCardMaskedNumber = secondCardInfo.getMaskedCardNumber();
     private String transferAmount;
 
 
@@ -26,12 +32,12 @@ public class TransferFromCardToCard {
     public void setUp() {
         open("http://localhost:9999/");
         loginPage = new LoginPage();
-        verificationPage = new VerificationPage();
-        cardsPage = new CardsPage();
-        depositCardPage = new DepositCardPage();
+        DataHelper.AuthInfo authInfo = getAuthInfo();
+        DataHelper.VerificationCode verificationCode = getVeriffCodeFor(authInfo);
+        loginPage.fillLoginForm(authInfo.getLogin(), authInfo.getPassword());
 
-        loginPage.fillLoginForm("vasya", "qwerty123");
-        verificationPage.fillVerificationForm("12345");
+        verificationPage = new VerificationPage();
+        verificationPage.fillVerificationForm(verificationCode.getCode());
     }
 
     @Test
@@ -39,29 +45,50 @@ public class TransferFromCardToCard {
         firstCardBalance = "10000";
         secondCardBalance = "10000";
         transferAmount = "100";
-        cardsPage.checkCardsBalance(firstCardBalance, secondCardBalance);
-        cardsPage.depositCard(firstCardNumber);
+
+        cardsPage = new CardsPage();
+        cardsPage.checkCardBalance(firstCardMaskedNumber, firstCardBalance);
+        cardsPage.checkCardBalance(secondCardMaskedNumber, secondCardBalance);
+
+        cardsPage.depositCard(firstCardMaskedNumber);
+        depositCardPage = new DepositCardPage();
         depositCardPage.fillForm(transferAmount, secondCardNumber);
         depositCardPage.checkCardNumberTo(firstCardMaskedNumber);
         depositCardPage.submitTransfer();
 
-        firstCardBalance = "10100";
-        secondCardBalance = "9900";
-        cardsPage.checkCardsBalance(firstCardBalance, secondCardBalance);
+        firstCardBalance = String.valueOf((Integer.parseInt(firstCardBalance) + Integer.parseInt(transferAmount)));
+        secondCardBalance = String.valueOf((Integer.parseInt(secondCardBalance) - Integer.parseInt(transferAmount)));
+        cardsPage.checkCardBalance(firstCardMaskedNumber, firstCardBalance);
     }
 
     @Test
     public void testTransferCancelTransferPositive() {
-        String firstCardInfo = cardsPage.getFirstCardInfo();
-        String secondCardInfo = cardsPage.getSecondCardInfo();
+        cardsPage = new CardsPage();
+        firstCardBalance = "10000";
+        secondCardBalance = "10000";
 
         transferAmount = "200";
-        cardsPage.depositCard(secondCardBalance);
+        cardsPage.depositCard(secondCardMaskedNumber);
+        depositCardPage = new DepositCardPage();
         depositCardPage.fillForm(transferAmount, firstCardNumber);
         depositCardPage.checkCardNumberTo(secondCardMaskedNumber);
         depositCardPage.cancelTransfer();
 
-        cardsPage.checkFirstCardInfo(firstCardInfo);
-        cardsPage.checkSecondCardInfo(secondCardInfo);
+        cardsPage.checkCardBalance(firstCardMaskedNumber, firstCardBalance);
+        cardsPage.checkCardBalance(secondCardMaskedNumber, secondCardBalance);
+    }
+
+    @Test
+    //Тест с багом. Если сумма перевода превышает баланс по счету, должна возникать ошибка
+    //https://github.com/lizaveta0/bdd/issues/1
+    public void testTransferNegative() {
+        transferAmount = "10000000";
+
+        cardsPage = new CardsPage();
+        cardsPage.depositCard(firstCardMaskedNumber);
+
+        depositCardPage = new DepositCardPage();
+        depositCardPage.fillForm(transferAmount, secondCardNumber);
+        depositCardPage.checkErrorMessageForAmount("Сумма перевода больше чем остаток по счету");
     }
 }

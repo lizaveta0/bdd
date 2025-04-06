@@ -1,12 +1,19 @@
 package data;
 
 import lombok.Value;
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.Map;
+import java.util.Random;
 
-@Value
 public class DataHelper {
+    public DataHelper() {
+    }
+
+    public static String generateRandomAmount(String max) {
+        Random random = new Random();
+        return String.valueOf(random.nextInt(Integer.parseInt(max + 1)));
+    }
+
     private static final Map<String, CardInfo> cards = Map.of(
             "0001", new CardInfo("5559 0000 0000 0001", "**** **** **** 0001"),
             "0002", new CardInfo("5559 0000 0000 0002", "**** **** **** 0002")
@@ -25,11 +32,6 @@ public class DataHelper {
     public static class CardInfo {
         String cardNumber;
         String maskedCardNumber;
-
-        public CardInfo(String cardNumber, String maskedCardNumber) {
-            this.cardNumber = cardNumber;
-            this.maskedCardNumber = maskedCardNumber;
-        }
     }
 
     public CardInfo getCardInfo(String last4Numbers) {

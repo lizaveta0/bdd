@@ -42,11 +42,13 @@ public class TransferFromCardToCard {
 
     @Test
     public void testTransferPositive() {
-        firstCardBalance = "10000";
-        secondCardBalance = "10000";
-        transferAmount = "100";
-
         cardsPage = new CardsPage();
+
+        firstCardBalance = cardsPage.getCardBalance(firstCardMaskedNumber);
+        secondCardBalance = cardsPage.getCardBalance(secondCardMaskedNumber);
+
+        transferAmount = generateRandomAmount(secondCardBalance);
+
         cardsPage.checkCardBalance(firstCardMaskedNumber, firstCardBalance);
         cardsPage.checkCardBalance(secondCardMaskedNumber, secondCardBalance);
 
@@ -59,15 +61,16 @@ public class TransferFromCardToCard {
         firstCardBalance = String.valueOf((Integer.parseInt(firstCardBalance) + Integer.parseInt(transferAmount)));
         secondCardBalance = String.valueOf((Integer.parseInt(secondCardBalance) - Integer.parseInt(transferAmount)));
         cardsPage.checkCardBalance(firstCardMaskedNumber, firstCardBalance);
+        cardsPage.checkCardBalance(secondCardMaskedNumber, secondCardBalance);
     }
 
     @Test
     public void testTransferCancelTransferPositive() {
         cardsPage = new CardsPage();
-        firstCardBalance = "10000";
-        secondCardBalance = "10000";
+        firstCardBalance = cardsPage.getCardBalance(firstCardMaskedNumber);
+        secondCardBalance = cardsPage.getCardBalance(secondCardMaskedNumber);
 
-        transferAmount = "200";
+        transferAmount = generateRandomAmount(firstCardBalance);
         cardsPage.depositCard(secondCardMaskedNumber);
         depositCardPage = new DepositCardPage();
         depositCardPage.fillForm(transferAmount, firstCardNumber);

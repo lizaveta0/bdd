@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Random;
 
 public class DataHelper {
-    public DataHelper() {
+    private DataHelper() {
     }
 
     public static String generateRandomAmount(String max) {
@@ -34,7 +34,7 @@ public class DataHelper {
         String maskedCardNumber;
     }
 
-    public CardInfo getCardInfo(String last4Numbers) {
+    public static CardInfo getCardInfo(String last4Numbers) {
         return cards.get(last4Numbers);
     }
 

@@ -12,8 +12,7 @@ public class DepositCardPage {
 
     private SelenideElement cancelButton = $("[data-test-id='action-cancel']");
     private SelenideElement submitButton = $("[data-test-id='action-transfer']");
-
-
+    private SelenideElement errorNotification = $("[data-test-id='error-notification']");
     //Заполнение формы
     public void fillForm(String amount, String from) {
         inputAmount.setValue(amount);
@@ -33,6 +32,6 @@ public class DepositCardPage {
     }
 
     public void checkErrorMessageForAmount(String error) {
-        inputAmount.shouldBe(visible, text(error));
+        errorNotification.shouldBe(visible, text(error));
     }
 }

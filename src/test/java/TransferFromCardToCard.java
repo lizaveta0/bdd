@@ -14,10 +14,9 @@ public class TransferFromCardToCard {
     private VerificationPage verificationPage;
     private CardsPage cardsPage;
     private DepositCardPage depositCardPage;
-    private DataHelper dataHelper = new DataHelper();
 
-    CardInfo firstCardInfo = dataHelper.getCardInfo("0001");
-    CardInfo secondCardInfo = dataHelper.getCardInfo("0002");
+    CardInfo firstCardInfo = getCardInfo("0001");
+    CardInfo secondCardInfo = getCardInfo("0002");
 
     private String firstCardBalance;
     private String firstCardNumber = firstCardInfo.getCardNumber();
@@ -48,9 +47,6 @@ public class TransferFromCardToCard {
         secondCardBalance = cardsPage.getCardBalance(secondCardMaskedNumber);
 
         transferAmount = generateRandomAmount(secondCardBalance);
-
-        cardsPage.checkCardBalance(firstCardMaskedNumber, firstCardBalance);
-        cardsPage.checkCardBalance(secondCardMaskedNumber, secondCardBalance);
 
         cardsPage.depositCard(firstCardMaskedNumber);
         depositCardPage = new DepositCardPage();
@@ -92,6 +88,7 @@ public class TransferFromCardToCard {
 
         depositCardPage = new DepositCardPage();
         depositCardPage.fillForm(transferAmount, secondCardNumber);
+        depositCardPage.submitTransfer();
         depositCardPage.checkErrorMessageForAmount("Сумма перевода больше чем остаток по счету");
     }
 }
